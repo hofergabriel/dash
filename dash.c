@@ -4,6 +4,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <limits.h>
+#include <stdarg.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 
 void cmdnm(char * pid){
@@ -70,13 +73,20 @@ void pid(char * command) {
   }
 }
 
+void otherwise(char * buf){
+  int status;
+  int pid = fork();
+  if(pid==0){
+    char * name[4];
+    name[0] = "/bin/bash";
+    name[1] = "-c";
+    name[2] = buf;
+    name[3] = NULL;
+    execvp("/bin/sh",name);
+  }
+  waitpid(pid,&status,0);
+}
 
-
-// proc/meminfo
-// proc/version
-#include <stdarg.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 
 void REPL(){
@@ -101,20 +111,7 @@ void REPL(){
     if(!strcmp(a, str3)) cd(b);
     if(!strcmp(a, str4)) return;
     if(!strcmp(a, str5)) systat();
-    else {
-      int status;
-      int pid = fork();
-      if(pid==0){
-        char * name[4];
-        name[0] = "/bin/bash";
-        name[1] = "-c";
-        name[2] = buf;
-        name[3] = NULL;
-        printf("BEFORE\n");
-        execvp("/bin/sh",name);
-      }
-      waitpid(pid,&status,0);
-    }
+    else otherwise(buf); 
   }
 }
 
