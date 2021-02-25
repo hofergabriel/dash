@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <limits.h>
 
 
 void cmdnm(char * pid){
@@ -37,6 +38,17 @@ void pid(char * command) {
   }
 }
 
+void cd(char * dir){
+  if(chdir(dir)!=0)
+    perror("error changing directories\n");
+}
+
+
+
+
+// proc/meminfo
+// proc/version
+
 
 
 void REPL(){
@@ -44,21 +56,23 @@ void REPL(){
   char a[32], b[32];
   char str1[] = "cmdnm";
   char str2[] = "pid";
+  char str3[] = "cd";
+  char str4[] = "exit"; 
   size_t leng=32;
+  char cwd[PATH_MAX];
+
   for(;;){
-    printf("dash> ");
+    getcwd(cwd, sizeof(cwd));  
+    printf("%s> ", cwd);
     getline(&buf, &leng, stdin);
     sscanf(buf, "%s%s", a, b);
-    if(!strcmp(a, str1)){
-      cmdnm(b);	
-    } 
-    if(!strcmp(a, str2)){
-      printf("pid...\n");
-      pid(b);
-    }
-    break;	
+
+    if(!strcmp(a, str1)) cmdnm(b);	
+    if(!strcmp(a, str2)) pid(b);
+    if(!strcmp(a, str3)) cd(b);
+    if(!strcmp(a, str4)) return;
+
   }
-  printf("\nexiting...\n");
 }
 
 
