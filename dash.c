@@ -16,6 +16,33 @@ void cmdnm(char * pid){
   fclose(fp);
 }
 
+void cd(char * dir){
+  if(chdir(dir)!=0)
+    perror("error changing directories\n");
+}
+
+void showfile(char * filename){
+  printf("%s: \n",filename);
+  char * buf=NULL;
+  size_t leng=32;
+  char path[256];
+  sprintf(path, "/proc/%s", filename);
+  FILE * fp = fopen(path,"r");
+  if(fp==NULL) return;
+  while(getline(&buf, &leng, fp) != -1)
+    printf("%s",buf);
+  printf("\n");
+  fclose(fp);
+}
+
+void systat(){
+  char nm[] = "version\0uptime\0meminfo\0cpuinfo\0";
+  showfile(nm);
+  showfile(&nm[8]);
+  showfile(&nm[15]);
+  showfile(&nm[23]);
+}
+
 void pid(char * command) {
   printf("%s\n\n",command);
   char pid[33], command2[256];
@@ -43,35 +70,13 @@ void pid(char * command) {
   }
 }
 
-void cd(char * dir){
-  if(chdir(dir)!=0)
-    perror("error changing directories\n");
-}
-
-void showfile(char * filename){
-  char * buf=NULL;
-  size_t leng=32;
-  char path[256];
-  sprintf(path, "/proc/%s", filename);
-  FILE * fp = fopen(path,"r");
-  if(fp==NULL) return;
-  while(getline(&buf, &leng, fp) != -1)
-    printf("%s",buf);
-  fclose(fp);
-}
-
-
-void systat(){
-  char nm[] = "meminfo\0cpuinfo\0uptime\0version\0";
-  showfile(nm);
-  showfile(&nm[8]);
-  showfile(&nm[16]);
-  showfile(&nm[23]);
-}
 
 
 // proc/meminfo
 // proc/version
+#include <stdarg.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 
 void REPL(){
@@ -97,16 +102,23 @@ void REPL(){
     if(!strcmp(a, str4)) return;
     if(!strcmp(a, str5)) systat();
     else {
-      system(buf); 
-
+      int status;
+      int pid = fork();
+      if(pid==0){
+        char * name[4];
+        name[0] = "/bin/bash";
+        name[1] = "-c";
+        name[2] = buf;
+        name[3] = NULL;
+        printf("BEFORE\n");
+        execvp("/bin/sh",name);
+      }
+      waitpid(pid,&status,0);
     }
   }
 }
 
 
-/***********************************************************/
-
-/***********************************************************/
 void main(){
   REPL();
 }
