@@ -20,7 +20,11 @@ void cmdnm(char * pid){
 }
 
 void cd(char * dir){
-  if(strlen(dir)==0) chdir(getenv("HOME"));
+  printf("%s\n",getenv("HOME"));
+  if(strlen(dir)==0){ 
+    printf("inside\n");
+    chdir(getenv("HOME"));
+  }
   else if(chdir(dir)!=0) 
     perror("something went wrong\n");
 }
@@ -89,6 +93,7 @@ void REPL(){
   char cwd[PATH_MAX];
 
   for(;;){
+    a[0]=b[0]='\0';
     getcwd(cwd, sizeof(cwd));  
     printf("%s> ", cwd);
     getline(&buf, &leng, stdin);
