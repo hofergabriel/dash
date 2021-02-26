@@ -8,6 +8,22 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+/***********************************************************************
+* Code listing from "Advanced Linux Programming," by CodeSourcery LLC  *
+* Copyright (C) 2001 by New Riders Publishing                          *
+* See COPYRIGHT for license information.                               *
+***********************************************************************/
+#include <sys/resource.h>
+#include <sys/time.h>
+
+void print_cpu_time()
+{
+  struct rusage usage;
+  getrusage (RUSAGE_SELF, &usage);
+  printf ("CPU time: %ld.%06ld sec user, %ld.%06ld sec system\n",
+	  usage.ru_utime.tv_sec, usage.ru_utime.tv_usec,
+	  usage.ru_stime.tv_sec, usage.ru_stime.tv_usec);
+}
 
 void cmdnm(char * pid){
   char path[256], scratch[256], nm[256];
@@ -56,7 +72,6 @@ void systat(){
 void pid(char * command) {
   char pid[33], command2[256];
   sprintf(command2, "(%s)", command);
-
 	
 	/* https://pubs.opengroup.org/onlinepubs/009695399/functions/opendir.html */
 	DIR * dir;
@@ -67,8 +82,6 @@ void pid(char * command) {
 		return;
 	}
 	while((dp = readdir(dir)) != NULL){
-  //for(int i=0;i<1e6;i++){
-		//printf("dirname: %s\n",dp->d_name);
 
     /* get path name */
     char path[512], scratch[256], nm[256];
@@ -83,10 +96,7 @@ void pid(char * command) {
   	if(!strcmp(command2,nm))
   	  printf("%s\n",dp->d_name);
   	fclose(fp);
-  //}
 	}
-
-
 }
 
 void otherwise(char * buf){
@@ -126,5 +136,8 @@ void REPL(){
   }
 }
 
-void main(){ REPL(); }
+void main(){ 
+	REPL(); 
+	print_cpu_time();
+}
 
