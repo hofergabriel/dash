@@ -20,7 +20,7 @@
 \maketitle
 %------------------------------------------------------------------------------
 \noindent \subsubsection*{Submission Contents} 
-\noindent The compressed folder contains three items: {\ttfamily Makefile}, {\ttfamily dash.c}, {\ttfamily doc.pdf}. \\ \\ {\ttfamily dash.c} contains the entire diagnostic shell program. {\ttfamily doc.pdf} contains the writeup and documentation for the program. {\ttfamily Makefile} compiles {\ttfamily dash.c}. 
+\noindent The compressed folder contains three items: {\ttfamily Makefile}, {\ttfamily dash.c}, {\ttfamily exam1.pdf}. \\ \\ {\ttfamily dash.c} contains the entire diagnostic shell program. {\ttfamily exam1.pdf} contains the writeup and documentation for the program. {\ttfamily Makefile} compiles {\ttfamily dash.c}. 
 
 \noindent \subsubsection*{How to Run the Program} \par
 Execute the following commands in the terminal to run the program: 
@@ -36,6 +36,8 @@ This program was tested by running the {\ttfamily dash} executable and entering 
 
 \noindent \subsubsection*{main \& REPL} \par
 The entry point for the program is the {\ttfamily main} function. {\ttfamily main} immediately calls the REPL (read-eval-print-loop). The REPL reads one line at a time and evaluates the command. If the command name is in the set \{ {\ttfamily cmdnm}, {\ttfamily pid}, {\ttfamily cd}, {\ttfamily systat} \}, then dash calls the function with the same name in the dash.c file. If the command isn't in the set, then {\ttfamily fork} and {\ttfamily execvp} are used to execute the command with a child process. The shell is terminated when the {\ttfamily exit} command is entered.
+
+\newpage
 \begin{verbatim}
 void REPL(){
   char * buf=NULL;
@@ -62,12 +64,11 @@ void REPL(){
 
 void main(){ 
   REPL(); 
-  print_cpu_time();
 }
 \end{verbatim}
 
 \noindent \subsubsection*{cmdnm} \par
-Returns the command string (name) that started the process for a given process id.
+Returns the command string (name) that started the process for a given process id. The function looks in the {\ttfamily /proc/<PID>/stat } file for the command string (it's the second element in the file). 
 \begin{verbatim}
 void cmdnm(char * pid){
   char path[256], scratch[256], nm[256];
@@ -80,8 +81,9 @@ void cmdnm(char * pid){
 }
 \end{verbatim}
 
+\newpage
 \noindent \subsubsection*{pid} \par
-Returns the process IDs for a given command string.
+Returns the process IDs for a given command string. The function looks through every {\ttfamily /proc/<PID>/stat} file in the {\ttfamily /proc} directory and prints the name of a directory when the {\ttfamily command} function parameter matches the second element in a {\ttfamily stat} file.
 \begin{verbatim}
 void pid(char * command) {
   char pid[33], command2[256];
@@ -107,7 +109,7 @@ void pid(char * command) {
 
 \noindent \subsubsection*{systat} \par
 Prints some process information to stdout: Linux version, 
-system uptime, memory usage, cpu info.
+system uptime, memory usage, cpu info. Specifically, the {\ttfamily showfile} function is called 4 times from {\ttfamily systat} to print the contents of 4 differents files. 
 \begin{verbatim}
 void showfile(char * filename){
   printf("%s: \n",filename);
@@ -122,7 +124,9 @@ void showfile(char * filename){
   printf("\n");
   fclose(fp);
 }
-
+\end{verbatim}
+\newpage
+\begin{verbatim}
 void systat(){
   char nm[] = "version\0uptime\0meminfo\0cpuinfo\0";
   showfile(nm);
@@ -133,7 +137,7 @@ void systat(){
 \end{verbatim}
 
 \noindent \subsubsection*{cd} \par
-Changes the directory.
+Changes the directory according to the path given using the chdir() function.
 \begin{verbatim}
 void cd(char * dir){
   printf("%s\n",getenv("HOME"));
@@ -148,11 +152,12 @@ void cd(char * dir){
 
 \noindent \subsubsection*{fork \& execvp} \par
 Creates a new child process. The child process executes the command that 
-was entered in into {\ttfamily dash} from {\ttfamily stdin}. The parent process waits for the child process to terminate before proceeding.
+was entered in into {\ttfamily dash} from {\ttfamily stdin}. The parent process waits for the child process to terminate before proceeding. The PID of the child process is printed immediately after it's created. 
 \begin{verbatim}
 void otherwise(char * buf){
   int status;
   int pid = fork();
+  if(pid!=0) printf("Child PID: %d\n",pid);
   if(pid==0){
     char * name[4];
     name[0] = "/bin/bash";
@@ -161,9 +166,11 @@ void otherwise(char * buf){
     name[3] = NULL;
     execvp("/bin/sh",name);
   }
+  get_RUSAGE_CHILDREN();
   waitpid(pid,&status,0);
 }
 \end{verbatim}
+\newpage
 
 \end{document}
 
