@@ -47,31 +47,21 @@ void systat(){
 }
 
 void pid(char * command) {
-  //printf("%s\n\n",command);
   char pid[33], command2[256];
   sprintf(command2, "(%s)", command);
-  //printf("%s\n\n",command2);
-
-  for(int i=0;i<13120;i++){
-
-
+  for(int i=0;i<1e6;i++){
     /* get path name */
     char path[256], scratch[256], nm[256];
     sprintf(path, "/proc/%d/stat", i);
 
-    /* open proc/<pid>/stat file */
+    /* try to open proc/<pid>/stat file */
     FILE *fp = fopen(path, "r");	
     if(fp==NULL) continue;
 
-    if(fp){ 
-      fscanf(fp, "%s%s", scratch, nm);
-      //printf("pid: %s cmdnm: %s\n",scratch,nm);
-      if(!strcmp(command2,nm)){
-        //printf("\t\t\tFOUND IT!\n");
-        printf("%s\n",scratch);
-        return;
-      }
-    }
+    /* if file exists */ 
+    fscanf(fp, "%s%s", scratch, nm);
+    if(!strcmp(command2,nm))
+      printf("%s\n",scratch);
     fclose(fp);
   }
 }
@@ -89,8 +79,6 @@ void otherwise(char * buf){
   }
   waitpid(pid,&status,0);
 }
-
-
 
 void REPL(){
   char * buf=NULL;
