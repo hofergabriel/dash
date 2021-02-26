@@ -7,22 +7,24 @@
 #include <stdarg.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <dirent.h>
+#include <libgen.h>
 
 /***********************************************************************
-* Code listing from "Advanced Linux Programming," by CodeSourcery LLC  *
-* Copyright (C) 2001 by New Riders Publishing                          *
-* See COPYRIGHT for license information.                               *
-***********************************************************************/
+ * Code listing from "Advanced Linux Programming," by CodeSourcery LLC  *
+ * Copyright (C) 2001 by New Riders Publishing                          *
+ * See COPYRIGHT for license information.                               *
+ ***********************************************************************/
 #include <sys/resource.h>
 #include <sys/time.h>
 
-void print_cpu_time()
+void get_RUSAGE_CHILDREN()
 {
   struct rusage usage;
-  getrusage (RUSAGE_SELF, &usage);
+  getrusage (RUSAGE_CHILDREN, &usage);
   printf ("CPU time: %ld.%06ld sec user, %ld.%06ld sec system\n",
-	  usage.ru_utime.tv_sec, usage.ru_utime.tv_usec,
-	  usage.ru_stime.tv_sec, usage.ru_stime.tv_usec);
+      usage.ru_utime.tv_sec, usage.ru_utime.tv_usec,
+      usage.ru_stime.tv_sec, usage.ru_stime.tv_usec);
 }
 
 void cmdnm(char * pid){
@@ -67,36 +69,26 @@ void systat(){
   showfile(&nm[23]);
 }
 
-#include <dirent.h>
-#include <libgen.h>
+/* https://pubs.opengroup.org/onlinepubs/009695399/functions/opendir.html */
 void pid(char * command) {
   char pid[33], command2[256];
   sprintf(command2, "(%s)", command);
-	
-	/* https://pubs.opengroup.org/onlinepubs/009695399/functions/opendir.html */
-	DIR * dir;
-	struct dirent *dp;
-
-	if((dir = opendir("/proc")) == NULL){
-		perror("Can't open directory\n");
-		return;
-	}
-	while((dp = readdir(dir)) != NULL){
-
-    /* get path name */
+  DIR * dir;
+  struct dirent *dp;
+  if((dir = opendir("/proc")) == NULL){
+    perror("Can't open directory\n");
+    return;
+  }
+  while((dp = readdir(dir)) != NULL){
     char path[512], scratch[256], nm[256];
     sprintf(path, "/proc/%s/stat", dp->d_name);
-
-    /* try to open proc/<pid>/stat file */
     FILE *fp = fopen(path, "r");	
     if(fp==NULL) continue;
-
-		/* if file exists */ 
-  	fscanf(fp, "%s%s", scratch, nm);
-  	if(!strcmp(command2,nm))
-  	  printf("%s\n",dp->d_name);
-  	fclose(fp);
-	}
+    fscanf(fp, "%s%s", scratch, nm);
+    if(!strcmp(command2,nm))
+      printf("%s\n",dp->d_name);
+    fclose(fp);
+  }
 }
 
 void otherwise(char * buf){
@@ -110,6 +102,7 @@ void otherwise(char * buf){
     name[3] = NULL;
     execvp("/bin/sh",name);
   }
+  get_RUSAGE_CHILDREN();
   waitpid(pid,&status,0);
 }
 
@@ -137,7 +130,6 @@ void REPL(){
 }
 
 void main(){ 
-	REPL(); 
-	print_cpu_time();
+  REPL(); 
 }
 
