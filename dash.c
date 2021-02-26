@@ -9,15 +9,14 @@
 #include <sys/wait.h>
 #include <dirent.h>
 #include <libgen.h>
+#include <sys/resource.h>
+#include <sys/time.h>
 
 /***********************************************************************
  * Code listing from "Advanced Linux Programming," by CodeSourcery LLC  *
  * Copyright (C) 2001 by New Riders Publishing                          *
  * See COPYRIGHT for license information.                               *
  ***********************************************************************/
-#include <sys/resource.h>
-#include <sys/time.h>
-
 void get_RUSAGE_CHILDREN()
 {
   struct rusage usage;
