@@ -20,7 +20,8 @@ void cmdnm(char * pid){
 }
 
 void cd(char * dir){
-  if(chdir(dir)!=0)
+  if(strlen(dir)==0) chdir(getenv("HOME"));
+  else if(chdir(dir)!=0) 
     perror("something went wrong\n");
 }
 
