@@ -47,27 +47,30 @@ void systat(){
 }
 
 void pid(char * command) {
-  printf("%s\n\n",command);
+  //printf("%s\n\n",command);
   char pid[33], command2[256];
   sprintf(command2, "(%s)", command);
-  printf("%s\n\n",command2);
+  //printf("%s\n\n",command2);
 
   for(int i=0;i<13120;i++){
 
-    sprintf(pid,"%d",i);
 
+    /* get path name */
     char path[256], scratch[256], nm[256];
-    sprintf(path, "/proc/%s/stat", pid);
+    sprintf(path, "/proc/%d/stat", i);
 
-    printf("path: %s\n",path);
-
+    /* open proc/<pid>/stat file */
     FILE *fp = fopen(path, "r");	
-    if(fp==NULL) return;
+    if(fp==NULL) continue;
+
     if(fp){ 
       fscanf(fp, "%s%s", scratch, nm);
-      printf("pid: %s cmdnm: %s\n",scratch,nm);
-      if(!strcmp(command2,nm))
-        printf("\t\t%s",nm);
+      //printf("pid: %s cmdnm: %s\n",scratch,nm);
+      if(!strcmp(command2,nm)){
+        //printf("\t\t\tFOUND IT!\n");
+        printf("%s\n",scratch);
+        return;
+      }
     }
     fclose(fp);
   }
@@ -107,10 +110,10 @@ void REPL(){
     sscanf(buf, "%s%s", a, b);
 
     if(!strcmp(a, str1)) cmdnm(b);	
-    if(!strcmp(a, str2)) pid(b);
-    if(!strcmp(a, str3)) cd(b);
-    if(!strcmp(a, str4)) return;
-    if(!strcmp(a, str5)) systat();
+    else if(!strcmp(a, str2)) pid(b);
+    else if(!strcmp(a, str3)) cd(b);
+    else if(!strcmp(a, str4)) return;
+    else if(!strcmp(a, str5)) systat();
     else otherwise(buf); 
   }
 }
