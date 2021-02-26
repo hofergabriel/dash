@@ -1,3 +1,9 @@
+/***********************************************************************
+ * Author: Gabriel Hofer                                                *
+ * Date: February 25, 2021                                              *
+ * Course: CSC-458                                                      *
+ * Instructor: Dr. Karlsson                                             *
+ ***********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,11 +44,8 @@ void cmdnm(char * pid){
 }
 
 void cd(char * dir){
-  printf("%s\n",getenv("HOME"));
-  if(strlen(dir)==0){ 
-    printf("inside\n");
+  if(strlen(dir)==0)
     chdir(getenv("HOME"));
-  }
   else if(chdir(dir)!=0) 
     perror("something went wrong\n");
 }
@@ -121,10 +124,9 @@ void REPL(){
     getline(&buf, &leng, stdin);
     sscanf(buf, "%s%s", a, b);
 
-    int allspaces=1;
+    char allspaces=1;
     for(int i=0;i<strlen(buf);i++)
-      if(allspaces && !isspace(buf[i]))
-        allspaces=0;
+      allspaces = (allspaces && isspace(buf[i]));
     if(allspaces) continue;
     if(!strcmp(a, str)) cmdnm(b);	
     else if(!strcmp(a, &str[6])) pid(b);

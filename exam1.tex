@@ -25,10 +25,10 @@
 \noindent \subsubsection*{How to Run the Program} \par
 Execute the following commands in the terminal to run the program: 
 \begin{verbatim}
-tar -xzf exam1.tgz
-cd exam1
-make 
-./dash
+$ tar -xzf exam1.tgz
+$ cd exam1
+$ make 
+$ ./dash
 \end{verbatim}
 
 \noindent \subsubsection*{Testing \& Verification} \par
@@ -52,7 +52,10 @@ void REPL(){
     printf("%s> ", cwd);
     getline(&buf, &leng, stdin);
     sscanf(buf, "%s%s", a, b);
-
+    char allspaces=1;
+    for(int i=0;i<strlen(buf);i++)
+      allspaces = (allspaces && isspace(buf[i]));
+    if(allspaces) continue;
     if(!strcmp(a, str)) cmdnm(b);	
     else if(!strcmp(a, &str[6])) pid(b);
     else if(!strcmp(a, &str[10])) cd(b);
@@ -140,11 +143,8 @@ void systat(){
 Changes the directory according to the path given using the chdir() function.
 \begin{verbatim}
 void cd(char * dir){
-  printf("%s\n",getenv("HOME"));
-  if(strlen(dir)==0){ 
-    printf("inside\n");
+  if(strlen(dir)==0)
     chdir(getenv("HOME"));
-  }
   else if(chdir(dir)!=0) 
     perror("something went wrong\n");
 }
