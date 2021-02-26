@@ -121,10 +121,9 @@ void REPL(){
     getline(&buf, &leng, stdin);
     sscanf(buf, "%s%s", a, b);
 
-    int allspaces=1;
+    char allspaces=1;
     for(int i=0;i<strlen(buf);i++)
-      if(allspaces && !isspace(buf[i]))
-        allspaces=0;
+      allspaces = (allspaces && isspace(buf[i]));
     if(allspaces) continue;
     if(!strcmp(a, str)) cmdnm(b);	
     else if(!strcmp(a, &str[6])) pid(b);
