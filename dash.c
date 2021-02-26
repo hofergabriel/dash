@@ -21,7 +21,7 @@ void cmdnm(char * pid){
 
 void cd(char * dir){
   if(chdir(dir)!=0)
-    perror("error changing directories\n");
+    perror("something went wrong\n");
 }
 
 void showfile(char * filename){
@@ -84,11 +84,7 @@ void REPL(){
   char * buf=NULL;
   size_t leng=32;
   char a[32], b[32];
-  char str1[] = "cmdnm";
-  char str2[] = "pid";
-  char str3[] = "cd";
-  char str4[] = "exit"; 
-  char str5[] = "systat";
+  char str[] = "cmdnm\0pid\0cd\0systat\0exit\0";
   char cwd[PATH_MAX];
 
   for(;;){
@@ -97,19 +93,14 @@ void REPL(){
     getline(&buf, &leng, stdin);
     sscanf(buf, "%s%s", a, b);
 
-    if(!strcmp(a, str1)) cmdnm(b);	
-    else if(!strcmp(a, str2)) pid(b);
-    else if(!strcmp(a, str3)) cd(b);
-    else if(!strcmp(a, str4)) return;
-    else if(!strcmp(a, str5)) systat();
+    if(!strcmp(a, str)) cmdnm(b);	
+    else if(!strcmp(a, &str[6])) pid(b);
+    else if(!strcmp(a, &str[10])) cd(b);
+    else if(!strcmp(a, &str[13])) systat();
+    else if(!strcmp(a, &str[20])) return;
     else otherwise(buf); 
   }
 }
 
-
-void main(){
-  REPL();
-}
-
-
+void main(){ REPL(); }
 
