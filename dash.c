@@ -51,24 +51,42 @@ void systat(){
   showfile(&nm[23]);
 }
 
+#include <dirent.h>
+#include <libgen.h>
 void pid(char * command) {
   char pid[33], command2[256];
   sprintf(command2, "(%s)", command);
-  for(int i=0;i<1e6;i++){
+
+	
+	/* https://pubs.opengroup.org/onlinepubs/009695399/functions/opendir.html */
+	DIR * dir;
+	struct dirent *dp;
+
+	if((dir = opendir("/proc")) == NULL){
+		perror("Can't open directory\n");
+		return;
+	}
+	while((dp = readdir(dir)) != NULL){
+  //for(int i=0;i<1e6;i++){
+		//printf("dirname: %s\n",dp->d_name);
+
     /* get path name */
-    char path[256], scratch[256], nm[256];
-    sprintf(path, "/proc/%d/stat", i);
+    char path[512], scratch[256], nm[256];
+    sprintf(path, "/proc/%s/stat", dp->d_name);
 
     /* try to open proc/<pid>/stat file */
     FILE *fp = fopen(path, "r");	
     if(fp==NULL) continue;
 
-    /* if file exists */ 
-    fscanf(fp, "%s%s", scratch, nm);
-    if(!strcmp(command2,nm))
-      printf("%s\n",scratch);
-    fclose(fp);
-  }
+		/* if file exists */ 
+  	fscanf(fp, "%s%s", scratch, nm);
+  	if(!strcmp(command2,nm))
+  	  printf("%s\n",dp->d_name);
+  	fclose(fp);
+  //}
+	}
+
+
 }
 
 void otherwise(char * buf){
