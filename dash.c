@@ -20,6 +20,11 @@
 #include <ctype.h>
 #include <sys/wait.h>
 
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+
 /***********************************************************************
  * Code listing from "Advanced Linux Programming," by CodeSourcery LLC  *
  * Copyright (C) 2001 by New Riders Publishing                          *
@@ -112,20 +117,120 @@ void otherwise(char * buf){
 }
 
 
-int handle_lt(char * buf, int idx){ }
-int handle_gt(char * buf, int idx){ }
+int handle_lt(char * buf, int idx){ 
+  printf("handle_lt\n");
 
-
-int handle_pipe(char * buf, int idx){
-  printf("handle pipe\n");
   char a[32], b[32];
-
-  printf("idx: %d\n", idx);
   strncpy(a, buf , idx );
   strncpy(b, buf + idx + 1, strlen(buf)-idx);
   b[strlen(buf)-idx]=a[idx]='\0';
   printf("a: %s \n b: %s\n",a,b);
-  
+
+/**********************************************************************/
+/*            The following code section is not mine                  */
+/* https://www.cse.sdsmt.edu/ckarlsso/csc458/spring21/src/ALP/pipe1.c */
+/**********************************************************************/
+
+////////////////////////////////////////////////////////////////////
+// Programmer: Jun Chen           Date: 10/15/92                  //
+// Purpose: Write a C program to demonstrate the use of fork(),   //
+// exec() and dup() for I/O redirection by doing the following.   //
+// When the program is run, take the command line argument after  //
+// the executable name as the name of another executable program  //
+// that is to be run in the background.  The next argument (if    //
+// it exists) is a file to which to redirect stdin, and the       //
+// next argument (again, if it exists) is a file to which to      //
+// redirect stdout.  After it forks the new process, the parent   //
+// should print a message to its standard output file giving      //
+// the process id of the child process.                           //
+////////////////////////////////////////////////////////////////////
+
+  int fpt1, fpt2, pid;
+  pid = fork();
+  if (pid == 0)
+    {
+    // child process executes here
+      if ((fpt1 = open(b, O_RDONLY)) == -1) {
+        printf("Unable to open %s for reading.\n", b);
+        exit(-1);
+      }
+      close(0);       // close child standard input
+      dup(fpt1);      // redirect the child input
+      close(fpt1);    // close unnecessary file descriptor
+      //execl("/bin/sh", argv[1], 0);
+      execl("/bin/sh", "sh ", "-c", a, NULL);
+    }
+  else
+    /* parent process executes here */
+    printf("The child process id number is %d \n",pid);
+
+}
+
+
+/**********************************************************************/
+/**********************************************************************/
+int handle_gt(char * buf, int idx){ 
+  printf("handle_gt\n");
+
+  char a[32], b[32];
+  strncpy(a, buf , idx );
+  strncpy(b, buf + idx + 1, strlen(buf)-idx);
+  b[strlen(buf)-idx]=a[idx]='\0';
+  printf("a: %s \n b: %s\n",a,b);
+
+/**********************************************************************/
+/*            The following code section is not mine                  */
+/* https://www.cse.sdsmt.edu/ckarlsso/csc458/spring21/src/ALP/pipe1.c */
+/**********************************************************************/
+
+////////////////////////////////////////////////////////////////////
+// Programmer: Jun Chen           Date: 10/15/92                  //
+// Purpose: Write a C program to demonstrate the use of fork(),   //
+// exec() and dup() for I/O redirection by doing the following.   //
+// When the program is run, take the command line argument after  //
+// the executable name as the name of another executable program  //
+// that is to be run in the background.  The next argument (if    //
+// it exists) is a file to which to redirect stdin, and the       //
+// next argument (again, if it exists) is a file to which to      //
+// redirect stdout.  After it forks the new process, the parent   //
+// should print a message to its standard output file giving      //
+// the process id of the child process.                           //
+////////////////////////////////////////////////////////////////////
+
+  int fpt1, fpt2, pid;
+  pid = fork();
+  if (pid == 0)
+    {
+        if ((fpt2 = creat(b, 0644)) == -1)
+          {
+          printf("Unable to open %s for writing.\n", b);
+          exit(-1);
+          }
+        close(1);       // close child standard output 
+        dup(fpt2);      // redirect the child output 
+        close(fpt2);    // close unnecessary file descriptor
+      execl("/bin/sh", "sh ", "-c", a, NULL);
+
+    }
+  else
+    /* parent process executes here */
+    printf("The child process id number is %d \n",pid);
+
+}
+
+
+/**********************************************************************/
+/**********************************************************************/
+int handle_pipe(char * buf, int idx){
+  printf("handle pipe\n");
+
+
+  char a[32], b[32];
+  strncpy(a, buf , idx );
+  strncpy(b, buf + idx + 1, strlen(buf)-idx);
+  b[strlen(buf)-idx]=a[idx]='\0';
+  printf("a: %s \n b: %s\n",a,b);
+
 /**********************************************************************/
 /*            The following code section is not mine                  */
 /* https://www.cse.sdsmt.edu/ckarlsso/csc458/spring21/src/ALP/pipe1.c */
@@ -185,15 +290,15 @@ int handle_pipe(char * buf, int idx){
 /**********************************************************************/
 /**********************************************************************/
 
-
   return 1;
 }
 
 int handle_redirection(char * buf){
+
   for(int i=0;i<strlen(buf);i++){
     if( buf[i]-'|' == 0 ) return handle_pipe(buf, i);
-    //if( buf[i]-'<' == 0 ) handle_gt(buf, i);
-    //if( buf[i]-'>' == 0 ) handle_lt(buf, i);
+    if( buf[i]-'<' == 0 ) handle_lt(buf, i);
+    if( buf[i]-'>' == 0 ) handle_gt(buf, i);
   }
   return 0; 
 }
