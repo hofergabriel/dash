@@ -252,6 +252,7 @@ int handle_pipe(char * buf, int idx){
   strncpy(a, buf , idx );
   strncpy(b, buf + idx + 1, strlen(buf)-(idx+1)-1);
   a[idx]='\0';
+  b[strlen(buf)-(idx+1)-1]='\0';
   //b[strlen(buf)-idx]=a[idx]='\0';
   printf("a: %s \n b: %s\n",a,b);
 
@@ -323,7 +324,6 @@ int handle_pipe(char * buf, int idx){
 /*                        PID Manager                                 */
 /**********************************************************************/
 int handle_redirection(char * buf){
-
   for(int i=0;i<strlen(buf);i++){
     if( buf[i]-'|' == 0 ) return handle_pipe(buf, i);
     if( buf[i]-'<' == 0 ) return handle_lt(buf, i);
