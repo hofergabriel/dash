@@ -348,7 +348,7 @@ int allocate_map(){
   pid_map = (char *) malloc(512);
 }
 
-void create_thread(){
+void new_thread(){
   int pid = allocate_pid();
   sleep(get_random_pid(0.2,5));
   release_pid(pid);
@@ -359,21 +359,27 @@ void testpid(){
   for(int i=0;i<10;i++){
     int p = fork();
     if(p==0){ 
-      create_thread();
+      new_thread();
       break;
     }
   }
 }
 
-
-
+/**********************************************************************/
+/*                      Memory Manager                                */
+/**********************************************************************/
+void memman(int addr){
+  printf("The address %d contains :\n", addr);
+  printf("page number = %d\n",addr / (1<<12));
+  printf("offset = %d\n", addr % (1<<12));
+}
 
 
 void REPL(){
   char * buf=NULL;
   size_t leng=32;
   char a[32], b[32];
-  char str[] = "cmdnm\0pid\0cd\0systat\0exit\0testpid";
+  char str[] = "cmdnm\0pid\0cd\0systat\0exit\0testpid\0memman\0";
   char cwd[PATH_MAX];
 
   for(;;){
@@ -394,6 +400,7 @@ void REPL(){
     else if(!strcmp(a, &str[20])) return;
     else if(handle_redirection(buf));
     else if(!strcmp(a, &str[25])) testpid();
+    else if(!strcmp(a, &str[33])) memman(atoi(b));
     else otherwise(buf); 
   }
 }
