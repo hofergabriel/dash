@@ -164,6 +164,9 @@ int handle_lt(char * buf, int idx){
     /* parent process executes here */
     printf("The child process id number is %d \n",pid);
 
+/**********************************************************************/
+/**********************************************************************/
+  return 1;
 }
 
 
@@ -216,6 +219,9 @@ int handle_gt(char * buf, int idx){
     /* parent process executes here */
     printf("The child process id number is %d \n",pid);
 
+/**********************************************************************/
+/**********************************************************************/
+  return 1;
 }
 
 
@@ -297,8 +303,8 @@ int handle_redirection(char * buf){
 
   for(int i=0;i<strlen(buf);i++){
     if( buf[i]-'|' == 0 ) return handle_pipe(buf, i);
-    if( buf[i]-'<' == 0 ) handle_lt(buf, i);
-    if( buf[i]-'>' == 0 ) handle_gt(buf, i);
+    if( buf[i]-'<' == 0 ) return handle_lt(buf, i);
+    if( buf[i]-'>' == 0 ) return handle_gt(buf, i);
   }
   return 0; 
 }
