@@ -307,6 +307,9 @@ int handle_pipe(char * buf, int idx){
   return 1;
 }
 
+/**********************************************************************/
+/*                        PID Manager                                 */
+/**********************************************************************/
 int handle_redirection(char * buf){
 
   for(int i=0;i<strlen(buf);i++){
@@ -316,7 +319,6 @@ int handle_redirection(char * buf){
   }
   return 0; 
 }
-
 
 int released_all(){
   for(int i=MIN_PID; i<=MAX_PID; i++)
@@ -328,11 +330,11 @@ int get_random_pid(int lower, int upper){
   return lower + (rand() % (upper - lower)); 
 }
 
-
 int allocate_pid(){
   int pid = get_random_pid(MIN_PID, MAX_PID);
   pid_map[ pid ]=1;
   printf("allocated %d\n", pid);
+  return pid;
 }
 
 int release_pid(int pid){
@@ -346,14 +348,23 @@ int allocate_map(){
   pid_map = (char *) malloc(512);
 }
 
+void create_thread(){
+  int pid = allocate_pid();
+  sleep(get_random_pid(0.2,5));
+  release_pid(pid);
+}
+
 void testpid(){
   allocate_map();
-  for(int i=0;i<30;i++)
-    allocate_pid();
-  //printf("released all : %d\n", released_all());
-  while(!released_all())
-    release_pid( get_random_pid(MIN_PID, MAX_PID));
+  for(int i=0;i<10;i++){
+    int p = fork();
+    if(p==0){ 
+      create_thread();
+      break;
+    }
+  }
 }
+
 
 
 
