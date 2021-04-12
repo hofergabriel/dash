@@ -147,17 +147,19 @@ int handle_pipe(char * buf, int idx){
     otherwise(a);
 
     fclose (stream);
-    return EXIT_SUCCESS;
+    return 1;
+    //return EXIT_SUCCESS;
   }
+  return 1;
 }
 
 int handle_redirection(char * buf){
   for(int i=0;i<strlen(buf);i++){
-    if( buf[i]-'|' == 0 ) handle_pipe(buf, i);
+    if( buf[i]-'|' == 0 ) return handle_pipe(buf, i);
     //if( buf[i]-'<' == 0 ) handle_gt(buf, i);
     //if( buf[i]-'>' == 0 ) handle_lt(buf, i);
   }
-  return 1; 
+  return 0; 
 }
 
 void REPL(){
