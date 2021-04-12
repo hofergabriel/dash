@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include<time.h>
 
 
 /* for the PID manager */
@@ -127,8 +128,10 @@ int handle_lt(char * buf, int idx){
 
   char a[32], b[32];
   strncpy(a, buf , idx );
-  strncpy(b, buf + idx + 1, strlen(buf)-idx);
-  b[strlen(buf)-idx]=a[idx]='\0';
+  strncpy(b, buf + idx + 1, strlen(buf)-(idx+1)-1);
+  a[idx]='\0';
+  b[strlen(buf)-(idx+1)-1]='\0';
+  //b[strlen(buf)-idx]=a[idx]='\0';
   printf("a: %s \n b: %s\n",a,b);
 
   /**********************************************************************/
@@ -182,8 +185,10 @@ int handle_gt(char * buf, int idx){
 
   char a[32], b[32];
   strncpy(a, buf , idx );
-  strncpy(b, buf + idx + 1, strlen(buf)-idx);
-  b[strlen(buf)-idx]=a[idx]='\0';
+  strncpy(b, buf + idx + 1, strlen(buf)-(idx+1)-1);
+  a[idx]='\0';
+  b[strlen(buf)-(idx+1)-1]='\0';
+  //b[strlen(buf)-idx]=a[idx]='\0';
   printf("a: %s \n b: %s\n",a,b);
 
   /**********************************************************************/
@@ -236,11 +241,11 @@ int handle_gt(char * buf, int idx){
 int handle_pipe(char * buf, int idx){
   printf("handle pipe\n");
 
-
   char a[32], b[32];
   strncpy(a, buf , idx );
-  strncpy(b, buf + idx + 1, strlen(buf)-idx);
-  b[strlen(buf)-idx]=a[idx]='\0';
+  strncpy(b, buf + idx + 1, strlen(buf)-(idx+1)-1);
+  a[idx]='\0';
+  //b[strlen(buf)-idx]=a[idx]='\0';
   printf("a: %s \n b: %s\n",a,b);
 
   /**********************************************************************/
@@ -350,11 +355,12 @@ int allocate_map(){
 
 void new_thread(){
   int pid = allocate_pid();
-  sleep(get_random_pid(0.2,5));
+  sleep(get_random_pid(1,5));
   release_pid(pid);
 }
 
 void testpid(){
+  srand(time(0));
   allocate_map();
   for(int i=0;i<10;i++){
     int p = fork();
