@@ -110,6 +110,56 @@ void otherwise(char * buf){
   waitpid(pid,&status,0);
 }
 
+
+int handle_lt(char * buf, int idx){ }
+int handle_gt(char * buf, int idx){ }
+
+
+int handle_pipe(char * buf, int idx){
+  printf("handle pipe\n");
+  char a[32], b[32];
+
+  printf("idx: %d\n", idx);
+  strncpy(a, buf , idx );
+  strncpy(b, buf + idx + 1, strlen(buf)-idx);
+  b[strlen(buf)-idx]=a[idx]='\0';
+  printf("a: %s \n b: %s\n",a,b);
+
+  int mypipe[2];
+  pipe(mypipe);
+  pid_t pid = fork();
+
+  if(pid == (pid_t) 0){
+    FILE *stream;
+    stream = fdopen (mypipe[0], "r");
+
+    close(mypipe[1]);
+    otherwise(b);
+
+    fclose (stream);
+
+    return EXIT_SUCCESS;
+  } else if(pid > (pid_t) 0){
+    FILE *stream;
+    stream = fdopen (mypipe[1], "w");
+
+    close(mypipe[0]);
+    otherwise(a);
+
+    fclose (stream);
+    return EXIT_SUCCESS;
+  }
+}
+
+int handle_redirection(char * buf){
+  for(int i=0;i<strlen(buf);i++){
+    if( buf[i]-'|' == 0 ) handle_pipe(buf, i);
+    //if( buf[i]-'<' == 0 ) handle_gt(buf, i);
+    //if( buf[i]-'>' == 0 ) handle_lt(buf, i);
+  }
+  return 1; 
+}
+
 void REPL(){
   char * buf=NULL;
   size_t leng=32;
@@ -133,6 +183,7 @@ void REPL(){
     else if(!strcmp(a, &str[10])) cd(b);
     else if(!strcmp(a, &str[13])) systat();
     else if(!strcmp(a, &str[20])) return;
+    else if(handle_redirection(buf));
     else otherwise(buf); 
   }
 }
