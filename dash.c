@@ -18,6 +18,7 @@
 #include <sys/resource.h>
 #include <sys/time.h>
 #include <ctype.h>
+#include <sys/wait.h>
 
 /***********************************************************************
  * Code listing from "Advanced Linux Programming," by CodeSourcery LLC  *
@@ -124,32 +125,67 @@ int handle_pipe(char * buf, int idx){
   strncpy(b, buf + idx + 1, strlen(buf)-idx);
   b[strlen(buf)-idx]=a[idx]='\0';
   printf("a: %s \n b: %s\n",a,b);
+  
+/**********************************************************************/
+/*            The following code section is not mine                  */
+/* https://www.cse.sdsmt.edu/ckarlsso/csc458/spring21/src/ALP/pipe1.c */
+/**********************************************************************/
 
-  int mypipe[2];
-  pipe(mypipe);
-  pid_t pid = fork();
+////////////////////////////////////////////////////////////////////
+//                     Pipe example program                       //
+//                     cat pipe.txt | sort                        //
+//   Just an example, but think about the question of whether     //
+//   child or grandchild should be input of pipe or should both   //
+//   be children of same parent?                                  //
+////////////////////////////////////////////////////////////////////
 
-  if(pid == (pid_t) 0){
-    FILE *stream;
-    stream = fdopen (mypipe[0], "r");
+  int fd_pipe[2];
+  int pid1;
+  int pid2;
+  int status;
+  int wpid;
 
-    close(mypipe[1]);
-    otherwise(b);
+  pid1 = fork();
+  if (pid1 == 0)
+    {
+    // child process executes here for input side of pipe
 
-    fclose (stream);
+    pipe(fd_pipe);           // create pipe
 
-    return EXIT_SUCCESS;
-  } else if(pid > (pid_t) 0){
-    FILE *stream;
-    stream = fdopen (mypipe[1], "w");
+    pid2 = fork();
+    if (pid2 == 0)
+      {
+      // grandchild process executes here for output side of pipe
+      close(1);              // close standard output
+      dup(fd_pipe[1]);       // redirect the output
+      close(fd_pipe[0]);     // close unnecessary file descriptor
+      close(fd_pipe[1]);     // close unnecessary file descriptor
+      execl("/bin/sh", "sh ", "-c", a, NULL);
+      printf("execl of /bin/cat failed\n");
+      exit(1);
+      }
 
-    close(mypipe[0]);
-    otherwise(a);
+    // back to process for input side of pipe
 
-    fclose (stream);
-    return 1;
-    //return EXIT_SUCCESS;
-  }
+    close(0);              // close standard input
+    dup(fd_pipe[0]);       // redirect the input
+    close(fd_pipe[0]);     // close unnecessary file descriptor
+    close(fd_pipe[1]);     // close unnecessary file descriptor
+    execl("/bin/sh", "sh", "-c", b, 0);
+    printf("execl of /bin/sort failed\n");
+    exit(1);
+    }
+  else
+    {
+    // parent process executes here
+    wpid = wait(&status);
+    printf("The child process id number is %d [%d]\n", pid1, wpid);
+    }
+
+/**********************************************************************/
+/**********************************************************************/
+
+
   return 1;
 }
 
