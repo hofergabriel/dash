@@ -131,24 +131,25 @@ int handle_lt(char * buf, int idx){
   b[strlen(buf)-idx]=a[idx]='\0';
   printf("a: %s \n b: %s\n",a,b);
 
-/**********************************************************************/
-/*            The following code section is not mine                  */
-/* https://www.cse.sdsmt.edu/ckarlsso/csc458/spring21/src/ALP/pipe1.c */
-/**********************************************************************/
+  /**********************************************************************/
+  /*            The following code section is not mine                  */
+  /*            or was modified from someone else's code                */
+  /* https://www.cse.sdsmt.edu/ckarlsso/csc458/spring21/src/ALP/pipe1.c */
+  /**********************************************************************/
 
-////////////////////////////////////////////////////////////////////
-// Programmer: Jun Chen           Date: 10/15/92                  //
-// Purpose: Write a C program to demonstrate the use of fork(),   //
-// exec() and dup() for I/O redirection by doing the following.   //
-// When the program is run, take the command line argument after  //
-// the executable name as the name of another executable program  //
-// that is to be run in the background.  The next argument (if    //
-// it exists) is a file to which to redirect stdin, and the       //
-// next argument (again, if it exists) is a file to which to      //
-// redirect stdout.  After it forks the new process, the parent   //
-// should print a message to its standard output file giving      //
-// the process id of the child process.                           //
-////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  // Programmer: Jun Chen           Date: 10/15/92                  //
+  // Purpose: Write a C program to demonstrate the use of fork(),   //
+  // exec() and dup() for I/O redirection by doing the following.   //
+  // When the program is run, take the command line argument after  //
+  // the executable name as the name of another executable program  //
+  // that is to be run in the background.  The next argument (if    //
+  // it exists) is a file to which to redirect stdin, and the       //
+  // next argument (again, if it exists) is a file to which to      //
+  // redirect stdout.  After it forks the new process, the parent   //
+  // should print a message to its standard output file giving      //
+  // the process id of the child process.                           //
+  ////////////////////////////////////////////////////////////////////
 
   int fpt1, fpt2, pid;
   pid = fork();
@@ -169,15 +170,13 @@ int handle_lt(char * buf, int idx){
     /* parent process executes here */
     printf("The child process id number is %d \n",pid);
 
-/**********************************************************************/
-/*                        End code section                            */
-/**********************************************************************/
+  /**********************************************************************/
+  /*                        End code section                            */
+  /**********************************************************************/
   return 1;
 }
 
 
-/**********************************************************************/
-/**********************************************************************/
 int handle_gt(char * buf, int idx){ 
   printf("handle_gt\n");
 
@@ -187,24 +186,25 @@ int handle_gt(char * buf, int idx){
   b[strlen(buf)-idx]=a[idx]='\0';
   printf("a: %s \n b: %s\n",a,b);
 
-/**********************************************************************/
-/*            The following code section is not mine                  */
-/* https://www.cse.sdsmt.edu/ckarlsso/csc458/spring21/src/ALP/pipe1.c */
-/**********************************************************************/
-
-////////////////////////////////////////////////////////////////////
-// Programmer: Jun Chen           Date: 10/15/92                  //
-// Purpose: Write a C program to demonstrate the use of fork(),   //
-// exec() and dup() for I/O redirection by doing the following.   //
-// When the program is run, take the command line argument after  //
-// the executable name as the name of another executable program  //
-// that is to be run in the background.  The next argument (if    //
-// it exists) is a file to which to redirect stdin, and the       //
-// next argument (again, if it exists) is a file to which to      //
-// redirect stdout.  After it forks the new process, the parent   //
-// should print a message to its standard output file giving      //
-// the process id of the child process.                           //
-////////////////////////////////////////////////////////////////////
+  /**********************************************************************/
+  /*            The following code section is not mine                  */
+  /*            or was modified from someone else's code                */
+  /* https://www.cse.sdsmt.edu/ckarlsso/csc458/spring21/src/ALP/pipe1.c */
+  /**********************************************************************/
+  
+  ////////////////////////////////////////////////////////////////////
+  // Programmer: Jun Chen           Date: 10/15/92                  //
+  // Purpose: Write a C program to demonstrate the use of fork(),   //
+  // exec() and dup() for I/O redirection by doing the following.   //
+  // When the program is run, take the command line argument after  //
+  // the executable name as the name of another executable program  //
+  // that is to be run in the background.  The next argument (if    //
+  // it exists) is a file to which to redirect stdin, and the       //
+  // next argument (again, if it exists) is a file to which to      //
+  // redirect stdout.  After it forks the new process, the parent   //
+  // should print a message to its standard output file giving      //
+  // the process id of the child process.                           //
+  ////////////////////////////////////////////////////////////////////
 
   int fpt1, fpt2, pid;
   pid = fork();
@@ -225,15 +225,14 @@ int handle_gt(char * buf, int idx){
     /* parent process executes here */
     printf("The child process id number is %d \n",pid);
 
-/**********************************************************************/
-/*                        End code section                            */
-/**********************************************************************/
+  /**********************************************************************/
+  /*                        End code section                            */
+  /**********************************************************************/
   return 1;
 }
 
 
-/**********************************************************************/
-/**********************************************************************/
+
 int handle_pipe(char * buf, int idx){
   printf("handle pipe\n");
 
@@ -244,18 +243,19 @@ int handle_pipe(char * buf, int idx){
   b[strlen(buf)-idx]=a[idx]='\0';
   printf("a: %s \n b: %s\n",a,b);
 
-/**********************************************************************/
-/*            The following code section is not mine                  */
-/* https://www.cse.sdsmt.edu/ckarlsso/csc458/spring21/src/ALP/pipe1.c */
-/**********************************************************************/
-
-////////////////////////////////////////////////////////////////////
-//                     Pipe example program                       //
-//                     cat pipe.txt | sort                        //
-//   Just an example, but think about the question of whether     //
-//   child or grandchild should be input of pipe or should both   //
-//   be children of same parent?                                  //
-////////////////////////////////////////////////////////////////////
+  /**********************************************************************/
+  /*            The following code section is not mine                  */
+  /*            or was modified from someone else's code                */
+  /* https://www.cse.sdsmt.edu/ckarlsso/csc458/spring21/src/ALP/pipe1.c */
+  /**********************************************************************/
+  
+  ////////////////////////////////////////////////////////////////////
+  //                     Pipe example program                       //
+  //                     cat pipe.txt | sort                        //
+  //   Just an example, but think about the question of whether     //
+  //   child or grandchild should be input of pipe or should both   //
+  //   be children of same parent?                                  //
+  ////////////////////////////////////////////////////////////////////
 
   int fd_pipe[2];
   int pid1;
@@ -300,9 +300,9 @@ int handle_pipe(char * buf, int idx){
     printf("The child process id number is %d [%d]\n", pid1, wpid);
     }
 
-/**********************************************************************/
-/*                        End code section                            */
-/**********************************************************************/
+  /**********************************************************************/
+  /*                        End code section                            */
+  /**********************************************************************/
 
   return 1;
 }
@@ -373,7 +373,6 @@ void memman(int addr){
   printf("page number = %d\n",addr / (1<<12));
   printf("offset = %d\n", addr % (1<<12));
 }
-
 
 void REPL(){
   char * buf=NULL;
