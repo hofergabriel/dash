@@ -25,11 +25,10 @@
 #include <unistd.h>
 #include<time.h>
 
+/**********************************************************************/
+/*                            EXAM 1 CODE                             */
+/**********************************************************************/
 
-/* for the PID manager */
-#define MIN_PID 300
-#define MAX_PID 500
-char * pid_map;
 
 /***********************************************************************
  * Code listing from "Advanced Linux Programming," by CodeSourcery LLC  *
@@ -121,6 +120,14 @@ void otherwise(char * buf){
   get_RUSAGE_CHILDREN();
   waitpid(pid,&status,0);
 }
+
+/**********************************************************************/
+/*                            EXAM 2 CODE                             */
+/**********************************************************************/
+/* for the PID manager */
+#define MIN_PID 300
+#define MAX_PID 500
+char * pid_map;
 
 
 int handle_lt(char * buf, int idx){ 
@@ -360,11 +367,11 @@ void new_thread(){
 }
 
 void testpid(){
-  srand(time(0));
   allocate_map();
   for(int i=0;i<10;i++){
     int p = fork();
     if(p==0){ 
+      srand(i);
       new_thread();
       break;
     }
