@@ -25,6 +25,11 @@
 #include <unistd.h>
 
 
+/* for the PID manager */
+#define MIN_PID 300
+#define MAX_PID 500
+char * pid_map;
+
 /***********************************************************************
  * Code listing from "Advanced Linux Programming," by CodeSourcery LLC  *
  * Copyright (C) 2001 by New Riders Publishing                          *
@@ -309,11 +314,52 @@ int handle_redirection(char * buf){
   return 0; 
 }
 
+
+int released_all(){
+  for(int i=MIN_PID; i<=MAX_PID; i++)
+    if(pid_map[i]!=0) return 0;
+  return 1;
+}
+
+int get_random_pid(int lower, int upper){
+  return lower + (rand() % (upper - lower)); 
+}
+
+
+int allocate_pid(){
+  int pid = get_random_pid(MIN_PID, MAX_PID);
+  pid_map[ pid ]=1;
+  printf("allocated %d\n", pid);
+}
+
+int release_pid(int pid){
+  if(pid_map[ pid ]){
+    pid_map[ pid ]=0;
+    printf("released %d\n", pid);
+  }
+}
+
+int allocate_map(){
+  pid_map = (char *) malloc(512);
+}
+
+void testpid(){
+  allocate_map();
+  for(int i=0;i<30;i++)
+    allocate_pid();
+  //printf("released all : %d\n", released_all());
+  while(!released_all())
+    release_pid( get_random_pid(MIN_PID, MAX_PID));
+}
+
+
+
+
 void REPL(){
   char * buf=NULL;
   size_t leng=32;
   char a[32], b[32];
-  char str[] = "cmdnm\0pid\0cd\0systat\0exit\0";
+  char str[] = "cmdnm\0pid\0cd\0systat\0exit\0testpid";
   char cwd[PATH_MAX];
 
   for(;;){
@@ -333,6 +379,7 @@ void REPL(){
     else if(!strcmp(a, &str[13])) systat();
     else if(!strcmp(a, &str[20])) return;
     else if(handle_redirection(buf));
+    else if(!strcmp(a, &str[25])) testpid();
     else otherwise(buf); 
   }
 }
